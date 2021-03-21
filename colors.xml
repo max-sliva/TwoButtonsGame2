@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#5594A8</color>
+    <color name="colorPrimaryDark">#00FFFFFF</color>
+    <color name="colorAccent">#307FCE</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorSelected">#467F94</color>
+    <color name="colorDarkBuilding">#000000</color>
+    <color name="colorGray">#808080</color>
+    <color name="colorRed">#FF0000</color>
+    <color name="colorGreen">#56D539</color>
+    <color name="colorPurple">#6865D8</color>
+    <color name="colorSnackBarFinish">#2FE68D</color>
+    <color name="colorSnackBarLoading">#5594A8</color>
+    <color name="colorSnackBarError">#E62F2F</color>
+    <color name="colorLecStatisticCircle">#82FF6C</color>
+    <color name="colorPractStatisticCircle">#FFAC4D</color>
+    <color name="colorLabStatisticCircle">#FF7947</color>
+    <color name="colorTransparentWhite">#25FFFFFF</color>
+    <color name="colorTransparentBlack">#33000000</color>
+    <color name="colorZeroItem">#C8C8C8</color>
+    <color name="colorAutoTextFirstStart">#3b475d</color>
+
+    <color name="colorItemFavorite">#ebf0f6</color>
+    <color name="colorItemFavoriteSelect">#69D881</color>
+
+    <color name="colorLessonTypeLab">#FF7947</color>
+    <color name="colorLessonTypePractice">#FFAC4D</color>
+    <color name="colorLessonTypeLecture">#62D556</color>
+    <color name="colorLessonTypeExam">#FF4545</color>
+    <color name="colorLessonTypeTest">#3EC2FF</color>
+    <color name="colorLessonTypeСonsultation">#7256FF</color>
+
+    <color name="colorDayClassRoom">#4982B3</color>
+
+    <color name="colorLink">#6B9ABA</color>
+
+</resources>
