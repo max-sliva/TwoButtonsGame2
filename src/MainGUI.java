@@ -111,31 +111,38 @@ public class MainGUI {
 		fitimLogo = new ImageIcon(newimg);
 		JLabel fitimLabel = new JLabel(fitimLogo);
 		Box logoPanel = new Box(BoxLayout.X_AXIS);
+		JPanel leftPlayer = createSideBox("1st player"); 
+		JPanel rightPlayer = createSideBox("2nd player"); 
+		Box leftBox = new Box(BoxLayout.Y_AXIS);
+//		leftBox.setAlignmentX(Box.CENTER_ALIGNMENT);
+		leftBox.add(leftPlayer);
+//		leftBox.add(nvsuLabel);
 		
+		Box rightBox = new Box(BoxLayout.Y_AXIS); 
+		rightBox.add(rightPlayer);
+//		rightBox.add(fitimLabel);
 		
-		logoPanel.add(nvsuLabel);
+		logoPanel.add(leftBox);
 		logoPanel.add(Box.createHorizontalGlue());
 		logoPanel.add(startBtn);
 		logoPanel.add(Box.createHorizontalGlue());
-		logoPanel.add(fitimLabel);
+		logoPanel.add(rightBox);
 		
 		Box centerBox = new Box(BoxLayout.Y_AXIS);
-		centerBox.add(logoPanel);
 		centerBox.add(centerPanel);
+		centerBox.add(logoPanel);
 		
 		northBox.add(loadBtn);
 		northBox.add(Box.createHorizontalGlue());
 		northBox.add(nextWord);
 		
-		Box leftBox = createSideBox("1st player"); 
-		Box rightBox = createSideBox("2nd player"); 
 		
 		mainFrame.add(northBox, BorderLayout.NORTH);
 		mainFrame.add(centerBox, BorderLayout.CENTER);
 //		mainFrame.add(nextWord, BorderLayout.EAST);
 		mainFrame.add(answer, BorderLayout.SOUTH);
-		mainFrame.add(leftBox, BorderLayout.WEST);
-		mainFrame.add(rightBox, BorderLayout.EAST);
+//		mainFrame.add(leftBox, BorderLayout.WEST);
+//		mainFrame.add(rightBox, BorderLayout.EAST);
 
 		mainFrame.setSize(800, 600);
 		mainFrame.setLocationRelativeTo(null);
@@ -143,15 +150,17 @@ public class MainGUI {
 		mainFrame.pack();
 		mainFrame.setVisible(true);
 	}
-	private static Box createSideBox(String string) {
+	private static JPanel createSideBox(String string) {
 		Font font = new Font("Serif", Font.BOLD, 12);
 		GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment(); // объект для регистрации шрифта
 		genv.registerFont(font); // регистрируем шрифт
 		font = font.deriveFont(41f); // задаем ему размер
 
-		Box sideBox = new Box(BoxLayout.Y_AXIS);
+//		Box sideBox = new Box(BoxLayout.Y_AXIS);
+		JPanel sideBox = new JPanel();
 		JLabel player = new JLabel(string);
 		player.setFont(font);
+//		player.setAlignmentX(Component.CENTER_ALIGNMENT);
 		sideBox.add(player);
 		Color myColor = new Color(32,77,128);
 		sideBox.setBorder(BorderFactory.createLineBorder(myColor, 5));

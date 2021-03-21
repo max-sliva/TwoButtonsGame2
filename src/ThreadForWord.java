@@ -63,7 +63,8 @@ public class ThreadForWord extends Thread {
 			arrayOfCharLabels.add(tempLabel);
 			arrayOfCharLabels.get(i).setFont(font);
 
-			arrayOfCharLabels.get(i).setBorder(BorderFactory.createLineBorder(myColor, 5));
+//			arrayOfCharLabels.get(i).setBorder(BorderFactory.createLineBorder(myColor, 5));
+			arrayOfCharLabels.get(i).setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 5));
 			centerPanel.add(arrayOfCharLabels.get(i));
 			for (int k = 1; k<10; k++) {
 //				tempLabel.setText(String.valueOf((char) rand.nextInt(20)+47));
