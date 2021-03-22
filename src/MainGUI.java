@@ -7,6 +7,8 @@ import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,11 +25,12 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class MainGUI {
 	static Font font;
 	static String str;
-	static JLabel answer;
+	static JTextField answer;
 	static File file = new File("а4.txt");
 	static FileReader myReader;
 	static BufferedReader bufReader;
@@ -43,7 +46,8 @@ public class MainGUI {
 		GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment(); // объект для регистрации шрифта
 		genv.registerFont(font); // регистрируем шрифт
 		font = font.deriveFont(82f); // задаем ему размер
-		answer = new JLabel();
+		answer = new JTextField();
+		answer.setForeground(Color.white);
 		file = new File("а4.txt");
 		System.out.println("file = " + file.getAbsolutePath());
 		myReader = new FileReader(file);
@@ -156,7 +160,6 @@ public class MainGUI {
 		
 		mainFrame.add(northBox, BorderLayout.NORTH);
 		mainFrame.add(centerBox, BorderLayout.CENTER);
-//		mainFrame.add(nextWord, BorderLayout.EAST);
 		mainFrame.add(answer, BorderLayout.SOUTH);
 //		mainFrame.add(leftBox, BorderLayout.WEST);
 //		mainFrame.add(rightBox, BorderLayout.EAST);
@@ -193,11 +196,30 @@ public class MainGUI {
 		Font countFont = player.getFont();
 		countFont = countFont.deriveFont(100f);
 		count.setFont(countFont);
+		count.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getButton()==MouseEvent.BUTTON1) countUp((JLabel)e.getSource());
+				else countDown((JLabel)e.getSource());
+			}
+		});
 		
 		count.setHorizontalAlignment(JLabel.CENTER);
 		sideBox.add(count);
 //		Color myColor = new Color(32,77,128);
 		sideBox.setBorder(BorderFactory.createLineBorder(myColor, 5));
 		return sideBox;
+	}
+	
+	protected static void countDown(JLabel source) {
+		System.out.println("count down");
+		int count = Integer.parseInt(source.getText());
+		count--;
+		source.setText(""+count);
+	}
+	protected static void countUp(JLabel source) {
+		System.out.println("count up");
+		int count = Integer.parseInt(source.getText());
+		count++;
+		source.setText(""+count);
 	}
 }

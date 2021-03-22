@@ -12,16 +12,17 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class ThreadForWord extends Thread {
 
 	private JPanel centerPanel; 
 	private String str;
-	private JLabel answer;
+	private JTextField answer;
 	private Font font;
 	private JButton nextWord;
 	
-	public ThreadForWord(JPanel centerPanel, String str, JLabel answer, JButton nextWord) {
+	public ThreadForWord(JPanel centerPanel, String str, JTextField answer, JButton nextWord) {
 		super();
 		font = new Font("Serif", Font.BOLD, 12);
 //		Font font = null;
