@@ -75,7 +75,7 @@ public class MainGUI {
 			}
 			bufReader = new BufferedReader(myReader);
 			nextWord.setEnabled(true);
-			startBtn.setEnabled(false);
+			startBtn.setEnabled(true);
 		});
 
 		nextWord.addActionListener(action -> {
