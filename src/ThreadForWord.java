@@ -1,7 +1,10 @@
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -21,6 +24,13 @@ public class ThreadForWord extends Thread {
 	public ThreadForWord(JPanel centerPanel, String str, JLabel answer, JButton nextWord) {
 		super();
 		font = new Font("Serif", Font.BOLD, 12);
+//		Font font = null;
+		try {
+			font = Font.createFont(Font.TRUETYPE_FONT, new File(System.getProperty("user.dir") + "/Fonts/RobotoMedium/Roboto-Medium.ttf"));
+		} catch (FontFormatException | IOException e) {
+			e.printStackTrace();
+		}
+
 		GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment(); // объект для регистрации шрифта
 		genv.registerFont(font); // регистрируем шрифт
 		font = font.deriveFont(82f); // задаем ему размер

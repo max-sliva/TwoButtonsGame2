@@ -5,6 +5,7 @@ import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,6 +33,8 @@ public class MainGUI {
 	static BufferedReader bufReader;
 	static int doneRemoving = 0;
 	static ThreadForWord myThread;
+	static Color myColor = new Color(32,77,128);
+
 	public static void main(String[] args) throws IOException, FontFormatException {
 		JFrame mainFrame = new JFrame("!!Игра!!");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -101,13 +104,15 @@ public class MainGUI {
 
 		ImageIcon nvsuLogo = new ImageIcon("nvsu_logo_small.png");
 		Image image = nvsuLogo.getImage(); // transform it 
-		Image newimg = image.getScaledInstance(300, 300,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+		Image newimg = image.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 		nvsuLogo = new ImageIcon(newimg);
 	
 		JLabel nvsuLabel = new JLabel(nvsuLogo);
+//		nvsuLabel.setBorder(BorderFactory.createLineBorder(myColor, 5));
+
 		ImageIcon fitimLogo= new ImageIcon("fitim_logo_small.png");
 		image = fitimLogo.getImage(); // transform it 
-		newimg = image.getScaledInstance(300, 300,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+		newimg = image.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 		fitimLogo = new ImageIcon(newimg);
 		JLabel fitimLabel = new JLabel(fitimLogo);
 		Box logoPanel = new Box(BoxLayout.X_AXIS);
@@ -128,8 +133,20 @@ public class MainGUI {
 		logoPanel.add(Box.createHorizontalGlue());
 		logoPanel.add(rightBox);
 		
-		Box centerBox = new Box(BoxLayout.Y_AXIS);
-		centerBox.add(centerPanel);
+//		Box centerBox = new Box(BoxLayout.Y_AXIS);
+		JPanel centerBox = new JPanel();
+//		centerBox.setLayout(new BoxLayout(centerBox, BoxLayout.Y_AXIS));
+		centerBox.setLayout(new GridLayout(2, 1));
+		
+//		centerBox.setBorder(BorderFactory.createLineBorder(myColor, 7));
+		JPanel labelPanel = new JPanel();
+		labelPanel.add(nvsuLabel);
+//		centerBox.add(labelPanel);
+		JPanel upperPanel = new JPanel(new BorderLayout());
+		upperPanel.add(labelPanel, BorderLayout.NORTH);
+		upperPanel.add(centerPanel, BorderLayout.CENTER);
+		centerPanel.setBorder(BorderFactory.createLineBorder(myColor, 5));
+		centerBox.add(upperPanel);
 		centerBox.add(logoPanel);
 		
 		northBox.add(loadBtn);
@@ -151,18 +168,35 @@ public class MainGUI {
 		mainFrame.setVisible(true);
 	}
 	private static JPanel createSideBox(String string) {
-		Font font = new Font("Serif", Font.BOLD, 12);
+//		Font font = new Font("Serif", Font.BOLD, 12);
+		Font font = null;
+		try {
+			font = Font.createFont(Font.TRUETYPE_FONT, new File(System.getProperty("user.dir") + "/Fonts/RobotoMedium/Roboto-Medium.ttf"));
+		} catch (FontFormatException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment(); // объект для регистрации шрифта
 		genv.registerFont(font); // регистрируем шрифт
 		font = font.deriveFont(41f); // задаем ему размер
 
 //		Box sideBox = new Box(BoxLayout.Y_AXIS);
-		JPanel sideBox = new JPanel();
+		JPanel sideBox = new JPanel(new GridLayout(2,1));
+//		sideBox.setLayout(new BoxLayout(sideBox, BoxLayout.Y_AXIS));
 		JLabel player = new JLabel(string);
+		player.setHorizontalAlignment(JLabel.CENTER);
 		player.setFont(font);
 //		player.setAlignmentX(Component.CENTER_ALIGNMENT);
 		sideBox.add(player);
-		Color myColor = new Color(32,77,128);
+		JLabel count = new JLabel("0");
+		Font countFont = player.getFont();
+		countFont = countFont.deriveFont(100f);
+		count.setFont(countFont);
+		
+		count.setHorizontalAlignment(JLabel.CENTER);
+		sideBox.add(count);
+//		Color myColor = new Color(32,77,128);
 		sideBox.setBorder(BorderFactory.createLineBorder(myColor, 5));
 		return sideBox;
 	}
