@@ -210,28 +210,29 @@ public class MainGUI {
 		countPanel.add(rightBox);
 		
 //		Box centerBox = new Box(BoxLayout.Y_AXIS);
-		JPanel centerBox = new JPanel(); //основная панель окна
+		JPanel centerBox = new JPanel(); //основная панель окна 
 //		centerBox.setLayout(new BoxLayout(centerBox, BoxLayout.Y_AXIS));
 		centerBox.setLayout(new GridLayout(2, 1));  //делаем на ней грид из 2-х строк и 1 столбца
 		
 //		centerBox.setBorder(BorderFactory.createLineBorder(myColor, 7));
 		JPanel labelPanel = new JPanel(); //панель с лого
-		labelPanel.add(nvsuLabel);
+		labelPanel.add(nvsuLabel); //добавляем в нее лого универа
+		labelPanel.add(fitimLabel); //и лого факультета
 //		centerBox.add(labelPanel);
-		JPanel upperPanel = new JPanel(new BorderLayout());
-		upperPanel.add(labelPanel, BorderLayout.NORTH);
-		upperPanel.add(centerPanel, BorderLayout.CENTER);
+		JPanel upperPanel = new JPanel(new BorderLayout()); //панель с BorderLayout 
+		upperPanel.add(labelPanel, BorderLayout.NORTH); //на север вставляем панель с лого
+		upperPanel.add(centerPanel, BorderLayout.CENTER); //в центр - панель с буквами
 		centerPanel.setBorder(BorderFactory.createLineBorder(myColor, 5));
-		centerBox.add(upperPanel);
+		centerBox.add(upperPanel); //в основную панель вставляем все остальные 
 		centerBox.add(countPanel);
 		
-		northBox.add(loadBtn);
+		northBox.add(loadBtn); //в самую верхнюю панель вставляем кнопки и выбор порта
 		northBox.add(Box.createHorizontalGlue());
 		northBox.add(comPorts);
 		northBox.add(Box.createHorizontalGlue());
 		northBox.add(nextWord);
 		
-		
+		//вставляем все в окно
 		mainFrame.add(northBox, BorderLayout.NORTH);
 		mainFrame.add(centerBox, BorderLayout.CENTER);
 		mainFrame.add(answer, BorderLayout.SOUTH);
@@ -244,56 +245,53 @@ public class MainGUI {
 		mainFrame.pack();
 		mainFrame.setVisible(true);
 	}
-	private static JPanel createSideBox(String string) {
+	private static JPanel createSideBox(String string) { //функция для создания боковых панелей со счетом 
 //		Font font = new Font("Serif", Font.BOLD, 12);
 		Font font = null;
-		try {
+		try { //загружаем универский шрифт
 			font = Font.createFont(Font.TRUETYPE_FONT, new File(System.getProperty("user.dir") + "/Fonts/RobotoMedium/Roboto-Medium.ttf"));
 		} catch (FontFormatException | IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		GraphicsEnvironment genv = GraphicsEnvironment.getLocalGraphicsEnvironment(); // объект для регистрации шрифта
 		genv.registerFont(font); // регистрируем шрифт
 		font = font.deriveFont(41f); // задаем ему размер
 
 //		Box sideBox = new Box(BoxLayout.Y_AXIS);
-		JPanel sideBox = new JPanel(new GridLayout(2,1));
+		JPanel sideBox = new JPanel(new GridLayout(2,1)); //панель с гридом 2 строки и 1 столбец
 //		sideBox.setLayout(new BoxLayout(sideBox, BoxLayout.Y_AXIS));
-		JLabel player = new JLabel(string);
-		player.setHorizontalAlignment(JLabel.CENTER);
-		player.setFont(font);
-//		player.setAlignmentX(Component.CENTER_ALIGNMENT);
-		sideBox.add(player);
-		JLabel count = new JLabel("0");
-		Font countFont = player.getFont();
-		countFont = countFont.deriveFont(100f);
-		count.setFont(countFont);
-		count.addMouseListener(new MouseAdapter() {
+		JLabel player = new JLabel(string);  //лейбл с названием игрока
+		player.setHorizontalAlignment(JLabel.CENTER); //выравнивание по центру
+		player.setFont(font);  //задаем шрифт
+		sideBox.add(player);  //лейбл на панель 
+		JLabel count = new JLabel("0");  //лейб со счетом
+		Font countFont = player.getFont();  //новый шрифт, берем из предыдущего лейбла
+		countFont = countFont.deriveFont(100f); //увеличиваем шрифт
+		count.setFont(countFont); //устанавливаем шрифт для счета
+		count.addMouseListener(new MouseAdapter() { //лиснер для обработки нажатия на счет
 			public void mouseClicked(MouseEvent e) {
-				if (e.getButton()==MouseEvent.BUTTON1) countUp((JLabel)e.getSource());
-				else countDown((JLabel)e.getSource());
+				if (e.getButton()==MouseEvent.BUTTON1) countUp((JLabel)e.getSource()); //если нажали ЛКМ, то вызываем метод для увеличения счета
+				else countDown((JLabel)e.getSource());  //иначе вызываем метод для уменьшения счета
 			}
 		});
 		
-		count.setHorizontalAlignment(JLabel.CENTER);
+		count.setHorizontalAlignment(JLabel.CENTER); //выравнивание по центру
 		sideBox.add(count);
 //		Color myColor = new Color(32,77,128);
-		sideBox.setBorder(BorderFactory.createLineBorder(myColor, 5));
+		sideBox.setBorder(BorderFactory.createLineBorder(myColor, 5));  //граница
 		return sideBox;
 	}
 	
-	protected static void countDown(JLabel source) {
+	protected static void countDown(JLabel source) { //метод для уменьшения счета
 		System.out.println("count down");
-		int count = Integer.parseInt(source.getText());
-		count--;
-		source.setText(""+count);
+		int count = Integer.parseInt(source.getText());  //берем счет с лейбла
+		count--; //уменьшаем его 
+		source.setText(""+count); //устанавливаем новый счет
 	}
-	protected static void countUp(JLabel source) {
+	protected static void countUp(JLabel source) { //метод для увеличения счета
 		System.out.println("count up");
-		int count = Integer.parseInt(source.getText());
-		count++;
-		source.setText(""+count);
+		int count = Integer.parseInt(source.getText());  //берем счет с лейбла
+		count++;  //увеличиваем его 
+		source.setText(""+count);  //устанавливаем новый счет
 	}
 }

@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="D:/JavaProjectsOxygen/TwoButtonsGame2/jssc-2.9.2.jar">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/D:/JavaProjectsOxygen/TwoButtonsGame2/jssc-2.9.2-javadoc.jar!/"/>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="F:/javaProjectsOxygen/TwoButtonsGame2/jssc-2.9.2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/F:/javaProjectsOxygen/TwoButtonsGame2/jssc-2.9.2-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
