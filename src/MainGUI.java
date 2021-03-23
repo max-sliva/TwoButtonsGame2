@@ -22,24 +22,30 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import jssc.SerialPort;
+import jssc.SerialPortException;
+import jssc.SerialPortList;
+
 public class MainGUI {
 	static Font font;
 	static String str;
-	static JTextField answer;
-	static File file = new File("а4.txt");
+	static JTextField answer;  //ответ внизу окна
+	static File file = new File("а4.txt"); //файл со словами по умолчанию
 	static FileReader myReader;
 	static BufferedReader bufReader;
-	static int doneRemoving = 0;
-	static ThreadForWord myThread;
-	static Color myColor = new Color(32,77,128);
-
+//	static int doneRemoving = 0;
+	static ThreadForWord myThread; //поток для анимации букв
+	static Color myColor = new Color(32,77,128); //цвет НВГУ 
+	static SerialPort serialPort = null;
+	
 	public static void main(String[] args) throws IOException, FontFormatException {
-		JFrame mainFrame = new JFrame("!!Игра!!");
+		JFrame mainFrame = new JFrame("!!!!!Игра!!");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //		font = Font.createFont(Font.TRUETYPE_FONT, new File(System.getProperty("user.dir") + "/ds_digital/DS-DIGIB.TTF")); //шрифт
 		font = new Font("Serif", Font.BOLD, 12);
@@ -47,29 +53,85 @@ public class MainGUI {
 		genv.registerFont(font); // регистрируем шрифт
 		font = font.deriveFont(82f); // задаем ему размер
 		answer = new JTextField();
-		answer.setForeground(Color.white);
-		file = new File("а4.txt");
+		answer.setForeground(Color.white); //цвет шрифта белый
+		JPanel leftPlayer = createSideBox("1st player"); //панели со счетом игроков
+		JPanel rightPlayer = createSideBox("2nd player"); 
+
+		String[] portNames = SerialPortList.getPortNames(); // получаем список портов
+		JComboBox<String> comPorts = new JComboBox<>(portNames); // создаем комбобокс с этим списком
+		comPorts.setSelectedIndex(-1); // чтоб не было выбрано ничего в комбобоксе
+		comPorts.addActionListener(arg -> { // слушатель выбора порта в комбобоксе
+			String choosenPort = comPorts.getItemAt(comPorts.getSelectedIndex()); // получаем название выбранного порта
+			//если serialPort еще не связана с портом или текущий порт не равен выбранному в комбо-боксе 
+			if (serialPort == null || !serialPort.getPortName().contains(choosenPort)) {
+				serialPort = new SerialPort(choosenPort); //задаем выбранный порт
+				try { //тут секция с try...catch для работы с портом 
+					serialPort.openPort(); //открываем порт
+					serialPort.setParams(9600, 8, 1, 0); //задаем параметры порта, 9600 - скорость, такую же нужно задать для Serial.begin в Arduino
+					//остальные параметры стандартные для работы с портом
+					serialPort.addEventListener(event -> {  //слушатель порта для приема сообщений от ардуино
+						if (event.isRXCHAR()) {// если есть данные для приема
+							try {  //тут секция с try...catch для работы с портом
+								String str = serialPort.readString(); //считываем данные из порта в строку
+								str = str.trim(); //убираем лишние символы (типа пробелов, которые могут быть в принятой строке) 
+								System.out.println(str); //выводим принятую строку
+								if (str.contains("button=1")) { 
+									leftPlayer.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 5)); //желтая рамка
+									if (myThread.isAlive()) myThread.suspendThread();  //ставим поток на паузу
+								}
+								if (str.contains("button=2")) {
+									rightPlayer.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 5));
+									if (myThread.isAlive()) myThread.suspendThread();
+								}
+							} catch (SerialPortException ex) { //для обработки возможных ошибок
+								System.out.println(ex);
+							}
+						}
+					});
+					
+				} catch (SerialPortException e) {//для обработки возможных ошибок
+					e.printStackTrace();
+				}
+			} else
+				System.out.println("Same port!!"); //это если выбрали в списке тот же порт, что и до этого
+		});
+		
+//		file = new File("а4.txt");
 		System.out.println("file = " + file.getAbsolutePath());
 		myReader = new FileReader(file);
 		bufReader = new BufferedReader(myReader);
 		JButton nextWord = new JButton("Next");
 		JButton startBtn = new JButton("Старт!");
-		JPanel centerPanel = new JPanel();
-		startBtn.addActionListener(e->{
+		JPanel centerPanel = new JPanel();  //центральная панель с буквами
+		centerPanel.addMouseListener(new MouseAdapter() { //для обработки нажатия на панель
+			public void mouseClicked(MouseEvent e) {
+				if (e.getButton()==MouseEvent.BUTTON1) { //если ЛКМ 
+					if (myThread.isAlive()) myThread.resumeThread(); //то возбновляем поток 
+				} else {
+					if (myThread.isAlive()) myThread.suspendThread();  //иначе (ПКМ) ставим поток на паузу
+				}
+			}
+		});
+		startBtn.addActionListener(e->{  //нажатие на кнопку Старт
 			try {
 				str = bufReader.readLine();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
+			leftPlayer.setBorder(BorderFactory.createLineBorder(myColor, 5)); //возвращаем нормальный цвет рамок счета игроков
+			rightPlayer.setBorder(BorderFactory.createLineBorder(myColor, 5));
 //			System.out.println("string = "+str);
-			myThread = new ThreadForWord(centerPanel, str, answer, nextWord);
-			myThread.start();
-			startBtn.setEnabled(false);
+			myThread = new ThreadForWord(centerPanel, str, answer, nextWord); //новый поток с новым словом
+			myThread.start(); //стартуем поток
+			startBtn.setEnabled(false); //делаем кнопку неактивной
 		});
 		
 		JButton loadBtn = new JButton("Load file");
-		loadBtn.addActionListener(action -> {
-			FileDialog fdlg = new FileDialog(mainFrame, "LoadFile");
+		loadBtn.addActionListener(action -> {  //нажатие на кнопку загрузки файла со словами
+			leftPlayer.setBorder(BorderFactory.createLineBorder(myColor, 5)); //возвращаем нормальный цвет рамок счета игроков
+			rightPlayer.setBorder(BorderFactory.createLineBorder(myColor, 5));
+
+			FileDialog fdlg = new FileDialog(mainFrame, "LoadFile");  //диалог открытия файла
 			fdlg.setDirectory(System.getProperty("user.dir"));
 			fdlg.setMode(FileDialog.LOAD);
 			fdlg.setVisible(true);
@@ -85,17 +147,20 @@ public class MainGUI {
 			startBtn.setEnabled(true);
 		});
 
-		nextWord.addActionListener(action -> {
+		nextWord.addActionListener(action -> {  //нажатие на кнопку следующего слова
 			try {
 				String oldStr = str;
 				str = bufReader.readLine();
-				if (str != null) {
+				leftPlayer.setBorder(BorderFactory.createLineBorder(myColor, 5));
+				rightPlayer.setBorder(BorderFactory.createLineBorder(myColor, 5));
+
+				if (str != null) { //если слово есть
 					System.out.println("Panel comps ="+centerPanel.getComponents().length);
-					myThread = new ThreadForWord(centerPanel, str, answer, nextWord);
+					myThread = new ThreadForWord(centerPanel, str, answer, nextWord);  //новый поток с новым словом
 					myThread.start();
 					if (oldStr!=null) {
 						System.out.println("oldStr.length = " + oldStr.length());
-						System.out.println("doneRemoving = "+doneRemoving);
+//						System.out.println("doneRemoving = "+doneRemoving);
 					}
 //					mainFrame.repaint();
 				} else
@@ -104,46 +169,53 @@ public class MainGUI {
 				e.printStackTrace();
 			}
 		});
-		Box northBox = new Box(BoxLayout.X_AXIS);
+		Box northBox = new Box(BoxLayout.X_AXIS);  //верхняя панель с кнопками загрузки файла, выбора порта, след. слово 
 
-		ImageIcon nvsuLogo = new ImageIcon("nvsu_logo_small.png");
-		Image image = nvsuLogo.getImage(); // transform it 
-		Image newimg = image.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-		nvsuLogo = new ImageIcon(newimg);
+		ImageIcon nvsuLogo = new ImageIcon("nvsu_logo_small.png"); //лого универа
+		Image image = nvsuLogo.getImage(); // объект для преобразования
+		Image newimg = image.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH); // задаем размер
+		nvsuLogo = new ImageIcon(newimg); //применяем новые параметры
 	
-		JLabel nvsuLabel = new JLabel(nvsuLogo);
+		JLabel nvsuLabel = new JLabel(nvsuLogo); //лейбл с лого универа
 //		nvsuLabel.setBorder(BorderFactory.createLineBorder(myColor, 5));
 
-		ImageIcon fitimLogo= new ImageIcon("fitim_logo_small.png");
-		image = fitimLogo.getImage(); // transform it 
-		newimg = image.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-		fitimLogo = new ImageIcon(newimg);
-		JLabel fitimLabel = new JLabel(fitimLogo);
-		Box logoPanel = new Box(BoxLayout.X_AXIS);
-		JPanel leftPlayer = createSideBox("1st player"); 
-		JPanel rightPlayer = createSideBox("2nd player"); 
-		Box leftBox = new Box(BoxLayout.Y_AXIS);
+		ImageIcon fitimLogo= new ImageIcon("fitim_logo_small.png"); //лого факультета
+		image = fitimLogo.getImage(); //объект для преобразования
+		newimg = image.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH); // задаем размер  
+		fitimLogo = new ImageIcon(newimg);  //применяем новые параметры
+		JLabel fitimLabel = new JLabel(fitimLogo);   //лейбл с лого факультета
+		
+		Box countPanel = new Box(BoxLayout.X_AXIS);  //панель со счетом
+		countPanel.addMouseListener(new MouseAdapter() {  //слушатель нажатия на панель для сброса цвета рамок
+			public void mouseClicked(MouseEvent e) {
+				if (e.getButton()==MouseEvent.BUTTON1) {
+					leftPlayer.setBorder(BorderFactory.createLineBorder(myColor, 5));
+					rightPlayer.setBorder(BorderFactory.createLineBorder(myColor, 5));
+				}
+			}
+		});
+		Box leftBox = new Box(BoxLayout.Y_AXIS);  //левая панель со счетом
 //		leftBox.setAlignmentX(Box.CENTER_ALIGNMENT);
 		leftBox.add(leftPlayer);
 //		leftBox.add(nvsuLabel);
 		
-		Box rightBox = new Box(BoxLayout.Y_AXIS); 
+		Box rightBox = new Box(BoxLayout.Y_AXIS); //правая панель со счетом
 		rightBox.add(rightPlayer);
 //		rightBox.add(fitimLabel);
 		
-		logoPanel.add(leftBox);
-		logoPanel.add(Box.createHorizontalGlue());
-		logoPanel.add(startBtn);
-		logoPanel.add(Box.createHorizontalGlue());
-		logoPanel.add(rightBox);
+		countPanel.add(leftBox); //добавляем левый, правый счет и кнопку старта
+		countPanel.add(Box.createHorizontalGlue());
+		countPanel.add(startBtn);
+		countPanel.add(Box.createHorizontalGlue());
+		countPanel.add(rightBox);
 		
 //		Box centerBox = new Box(BoxLayout.Y_AXIS);
-		JPanel centerBox = new JPanel();
+		JPanel centerBox = new JPanel(); //основная панель окна
 //		centerBox.setLayout(new BoxLayout(centerBox, BoxLayout.Y_AXIS));
-		centerBox.setLayout(new GridLayout(2, 1));
+		centerBox.setLayout(new GridLayout(2, 1));  //делаем на ней грид из 2-х строк и 1 столбца
 		
 //		centerBox.setBorder(BorderFactory.createLineBorder(myColor, 7));
-		JPanel labelPanel = new JPanel();
+		JPanel labelPanel = new JPanel(); //панель с лого
 		labelPanel.add(nvsuLabel);
 //		centerBox.add(labelPanel);
 		JPanel upperPanel = new JPanel(new BorderLayout());
@@ -151,9 +223,11 @@ public class MainGUI {
 		upperPanel.add(centerPanel, BorderLayout.CENTER);
 		centerPanel.setBorder(BorderFactory.createLineBorder(myColor, 5));
 		centerBox.add(upperPanel);
-		centerBox.add(logoPanel);
+		centerBox.add(countPanel);
 		
 		northBox.add(loadBtn);
+		northBox.add(Box.createHorizontalGlue());
+		northBox.add(comPorts);
 		northBox.add(Box.createHorizontalGlue());
 		northBox.add(nextWord);
 		
